@@ -28,7 +28,8 @@ dependencies:
   font_awesome_flutter: ^10.1.0
   google_fonts: ^3.0.1
   substring_highlight: ^1.0.33
-  
+  lottie: ^1.2.2
+  shared_preferences: ^2.0.15
 
 dev_dependencies:
   flutter_test:
@@ -72,6 +73,7 @@ flutter:
    - assets/images/
    - assets/images/populars/
    - assets/images/search/
+   - assets/animations/
  
 
   # example:
