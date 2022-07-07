@@ -5,6 +5,8 @@ import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:artisan/models/artisan.dart';
+import 'package:artisan/models/commune.dart';
+import 'package:artisan/models/departement.dart';
 
 void main() {
   runApp(const MyApp());
@@ -60,7 +62,7 @@ class _MyHomePageState extends State<MyHomePage> {
   @override
   Widget build(BuildContext context) {
     List<Artisan> x= Artisan.getArtisans();
-    print('Nombre d\'artisans: ${x.length}');
+    print('Nombre d\'artisans: ${x.length} Départements: ${Departement.getDepartements().length} Communes : ${Commune.getCommunes().length} ');
     Size size = MediaQuery.of(context).size;
 
     return Scaffold(

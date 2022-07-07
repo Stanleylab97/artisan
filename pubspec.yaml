@@ -46,10 +46,10 @@ flutter_native_splash:
       android: true
       ios: true
       web: false
-      image: assets/images/rounded_logo.png
+      image: assets/images/logo.png
       android_12:
         color: "#5F9221"
-        image: assets/images/rounded_logo.png
+        image: assets/images/logo.png
         icon_background_color: "#111111"
 
 flutter_icons:
