@@ -1,5 +1,8 @@
 import 'dart:convert';
+import 'dart:ui';
 
+import 'package:artisan/models/commune.dart';
+import 'package:artisan/models/departement.dart';
 import 'package:artisan/pages/detailsArtisan.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/src/foundation/key.dart';
@@ -8,6 +11,8 @@ import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:lottie/lottie.dart';
+import 'package:searchfield/searchfield.dart';
+import 'package:sliding_up_panel2/sliding_up_panel2.dart';
 import 'package:substring_highlight/substring_highlight.dart';
 import '../models/artisan.dart' show Artisan, UserModel;
 
@@ -27,16 +32,25 @@ class _SearchState extends State<Search> {
 
   late TextEditingController controller = TextEditingController();
 
+  late List<String> param = ['', ''];
+
+  double _fabHeight = 0;
+  double _panelHeightOpen = 0;
+  double _panelHeightClosed = 95.0;
+  late final ScrollController scrollController;
+  late final PanelController panelController;
+
   @override
   void initState() {
+    scrollController = ScrollController();
+    panelController = PanelController();
     super.initState();
-    setState(() {
-      listArtisans = filteredArtisans = Artisan.getArtisans();
-    });
+    listArtisans = filteredArtisans = Artisan.getArtisans();
   }
 
   @override
   void dispose() {
+    scrollController.dispose();
     controller.dispose();
     super.dispose();
   }
@@ -71,125 +85,289 @@ class _SearchState extends State<Search> {
   @override
   Widget build(BuildContext context) {
     Size size = MediaQuery.of(context).size;
-    return Scaffold(
-        body: Stack(children: [
-      Positioned.fill(
-          child: Column(
-        children: [
-          Column(
-            children: [
-              Container(
-                width: size.width,
-                height: size.height * .13,
-                decoration: BoxDecoration(
-                    // color: Color.fromRGBO(205, 54, 39, 0.7),
-                    image: DecorationImage(
-                        image: AssetImage('assets/images/search/search.jpg'),
-                        colorFilter: ColorFilter.mode(
-                            Color.fromRGBO(205, 54, 39, 0.7).withOpacity(0.7),
-                            BlendMode.modulate),
-                        fit: BoxFit.cover)),
-                child: Transform.translate(
-                  offset: Offset(0, 18),
-                  child: Center(
-                    child: Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 20),
-                      child: Column(
-                        children: [
-                          TextField(
-                              controller: controller,
-                              //focusNode: focusNode,
-                              // onEditingComplete: onEditingComplete,
-                              onChanged: (value) {
-                                if (value.length > 0)
-                                  setState(() {
-                                    isSearching == true;
-                                  });
+    _panelHeightOpen = size.height * .50;
 
-                                if (value.length == 0)
-                                  setState(() {
-                                    isSearching == false;
-                                  });
-                                _filteredArtisans(value);
-                              },
-                              decoration: InputDecoration(
-                                  fillColor: Colors.white,
-                                  filled: true,
-                                  border: OutlineInputBorder(
-                                    borderRadius: BorderRadius.circular(8),
-                                    borderSide:
-                                        BorderSide(color: Colors.grey[300]!),
-                                  ),
-                                  focusedBorder: OutlineInputBorder(
-                                    borderRadius: BorderRadius.circular(8),
-                                    borderSide:
-                                        BorderSide(color: Colors.grey[300]!),
-                                  ),
-                                  enabledBorder: OutlineInputBorder(
-                                    borderRadius: BorderRadius.circular(8),
-                                    borderSide:
-                                        BorderSide(color: Colors.grey[300]!),
-                                  ),
-                                  hintText: "Rechercher un artisan",
-                                  hintStyle: TextStyle(color: Colors.black45),
-                                  prefixIcon: Icon(
-                                    Icons.search,
-                                    color: Colors.black,
-                                  ),
-                                  suffixIcon: isSearching == false
-                                      ? IconButton(
-                                          icon:
-                                              FaIcon(FontAwesomeIcons.sliders),
-                                          onPressed: () {},
-                                        )
-                                      : IconButton(
-                                          icon: Icon(Icons.cancel),
-                                          onPressed: () {
-                                            setState(() {
-                                              isSearching = !isSearching;
-                                              controller.clear();
-                                              filteredArtisans = listArtisans;
-                                            });
-                                          },
-                                        ))),
+    return Scaffold(
+      appBar: AppBar(
+        title: Text(
+          'Liste des artisans',
+          style: TextStyle(color: Colors.white),
+        ),
+        actions: [
+          IconButton(
+            onPressed: () {
+              showSearch(
+                context: context,
+                delegate: CustomSearchDelegate(),
+              );
+            },
+            icon: const Icon(FontAwesomeIcons.magnifyingGlass),
+          )
+        ],
+      ),
+      body: Stack(
+        alignment: Alignment.topCenter,
+        children: <Widget>[
+          SlidingUpPanel(
+            snapPoint: .5,
+            disableDraggableOnScrolling: false,
+            header: SizedBox(
+              width: MediaQuery.of(context).size.width,
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  ForceDraggableWidget(
+                    child: Container(
+                      width: 100,
+                      height: 40,
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
                           SizedBox(
-                            height: size.height * .01,
+                            height: 12.0,
                           ),
-                          filteredArtisans.length > 1
-                              ? Text(
-                                  '${filteredArtisans.length} Résultats trouvés',
-                                  style: TextStyle(
-                                      fontWeight: FontWeight.w500,
-                                      color: Colors.white))
-                              : Text(
-                                  '${filteredArtisans.length}  Résultat trouvé',
-                                  style: TextStyle(
-                                      fontWeight: FontWeight.w500,
-                                      color: Colors.white))
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: <Widget>[
+                              Container(
+                                width: 30,
+                                height: 7,
+                                decoration: BoxDecoration(
+                                    color: Colors.white,
+                                    borderRadius: BorderRadius.all(
+                                        Radius.circular(12.0))),
+                              ),
+                            ],
+                          ),
                         ],
                       ),
                     ),
                   ),
-                ),
+                ],
               ),
-            ],
+            ),
+            maxHeight: _panelHeightOpen,
+            minHeight: size.height * .07,
+            parallaxEnabled: true,
+            parallaxOffset: .5,
+            body: ArtisanList(filteredArtisans: filteredArtisans),
+            controller: panelController,
+            scrollController: scrollController,
+            panelBuilder: () => _panel(),
+            borderRadius: BorderRadius.only(
+                topLeft: Radius.circular(20.0),
+                topRight: Radius.circular(20.0)),
+            onPanelSlide: (double pos) => setState(() {}),
+            color: Colors.green.withOpacity(0.9),
           ),
-          Expanded(
-              child: filteredArtisans.length == 0
-                  ? Center(
-                      child: Lottie.asset(
-                          'assets/animations/lf30_editor_8djg3wcl.json'))
-                  : ListView.builder(
-                      itemBuilder: (BuildContext context, int index) {
-                        Artisan item = filteredArtisans[index];
-                        return InkWell(
-                          onTap: () {
-                            Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                    builder: (context) =>
-                                        DetailArtisan(artisan: item)));
-                          },
+        ],
+      ),
+    );
+  }
+
+  Widget _panel() {
+    TextEditingController _selectedDepartement = TextEditingController();
+    TextEditingController _selectedcommune = TextEditingController();
+
+    return MediaQuery.removePadding(
+        context: context,
+        removeTop: true,
+        child: ListView(
+          physics: PanelScrollPhysics(controller: panelController),
+          controller: scrollController,
+          children: <Widget>[
+            SizedBox(
+              height: MediaQuery.of(context).size.height * .037,
+            ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: <Widget>[
+                Text(
+                  "Recherche avancée",
+                  style: TextStyle(
+                      fontWeight: FontWeight.normal,
+                      fontSize: 20.0,
+                      color: Colors.white),
+                ),
+              ],
+            ),
+            SizedBox(
+              height: 36.0,
+            ),
+            Container(
+              padding: const EdgeInsets.only(left: 24.0, right: 24.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: <Widget>[
+                  Padding(
+                    padding: EdgeInsets.all(20),
+                    child: Text(
+                      "Département:",
+                      style: TextStyle(fontSize: 16, color: Colors.white),
+                    ),
+                  ),
+                  Container(
+                    child: SearchField(
+                      //controller: _selectedDepartement,
+                      onSuggestionTap: (x) {
+                        param[0] = Departement.getDepartements()
+                            .firstWhere((element) => element.nom == x.searchKey)
+                            .code;
+
+                        print(param[0]);
+                      },
+                      hint: 'Saisissez le nom du département',
+                      searchStyle: TextStyle(
+                        fontSize: 18,
+                        color: Colors.white.withOpacity(0.8),
+                      ),
+                      //onSuggestionTap:,
+                      suggestions: Departement.getDepartements()
+                          .map((e) =>
+                              SearchFieldListItem(e.nom, child: Text(e.nom)))
+                          .toList(),
+                      searchInputDecoration: InputDecoration(
+                          hintStyle: TextStyle(color: Colors.white),
+                          enabledBorder: OutlineInputBorder(
+                              borderSide:
+                                  BorderSide(color: Colors.white, width: 1),
+                              borderRadius: BorderRadius.circular(10)),
+                          focusedBorder: OutlineInputBorder(
+                              borderSide:
+                                  BorderSide(color: Colors.white, width: 2),
+                              borderRadius: BorderRadius.circular(10))),
+                      itemHeight: 50,
+                      suggestionsDecoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(10)),
+                    ),
+                  ),
+                  Padding(
+                    padding: EdgeInsets.all(20),
+                    child: Text(
+                      "Commune:",
+                      style: TextStyle(fontSize: 16, color: Colors.white),
+                    ),
+                  ),
+                  Container(
+                    child: SearchField(
+                      // controller: _selectedcommune,
+                      onSuggestionTap: (x) {
+                        param[1] = Commune.getCommunes()
+                            .firstWhere((element) => element.nom == x.searchKey)
+                            .code;
+                      },
+                      hint: 'Saisissez le nom de la commune',
+                      searchStyle: TextStyle(
+                        fontSize: 18,
+                        color: Colors.white.withOpacity(0.8),
+                      ),
+                      //onSuggestionTap:,
+                      suggestions: Commune.getCommunes()
+                          .map((e) =>
+                              SearchFieldListItem(e.nom, child: Text(e.nom)))
+                          .toList(),
+                      searchInputDecoration: InputDecoration(
+                          hintStyle: TextStyle(color: Colors.white),
+                          enabledBorder: OutlineInputBorder(
+                              borderSide:
+                                  BorderSide(color: Colors.white, width: 1),
+                              borderRadius: BorderRadius.circular(10)),
+                          focusedBorder: OutlineInputBorder(
+                              borderSide:
+                                  BorderSide(color: Colors.white, width: 2),
+                              borderRadius: BorderRadius.circular(10))),
+                      itemHeight: 50,
+                      suggestionsDecoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(10)),
+                    ),
+                  ),
+                  SizedBox(
+                    height: 10,
+                  ),
+                  InkWell(
+                    hoverColor: Colors.orange,
+                    splashColor: Colors.red,
+                    focusColor: Colors.yellow,
+                    highlightColor: Colors.purple,
+                    onTap: () {
+                      setState(() {
+                        print('Dep ${param[0]} in commune ${param[1]}');
+                        filteredArtisans = filteredArtisans
+                            .where((artisan) =>
+                                artisan.addrDept == param[0] &&
+                                artisan.commune == param[1])
+                            .toList();
+                        print('Liste filtrée: ${filteredArtisans.length}');
+                      });
+                      panelController.close();
+                    },
+                    borderRadius: BorderRadius.circular(20),
+                    child: Container(
+                      width: 200,
+                      height: 50,
+                      decoration: BoxDecoration(
+                        color: Colors.yellow,
+                        borderRadius: BorderRadius.circular(15),
+                      ),
+                      alignment: Alignment.center,
+                      child: const Text('Appliquer'),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            SizedBox(
+              height: 24,
+            ),
+          ],
+        ));
+  }
+}
+
+class PanelWidget extends StatelessWidget {
+  final ScrollController controller;
+
+  PanelWidget({Key? key, required this.controller}) : super(key: key);
+  @override
+  Widget build(BuildContext context) => ListView();
+}
+
+class ArtisanList extends StatelessWidget {
+  const ArtisanList({
+    Key? key,
+    required this.filteredArtisans,
+  }) : super(key: key);
+
+  final List<Artisan> filteredArtisans;
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        Expanded(
+            child: filteredArtisans.length == 0
+                ? Center(
+                    child: Lottie.asset(
+                        'assets/animations/lf30_editor_8djg3wcl.json'))
+                : ListView.builder(
+                    itemBuilder: (BuildContext context, int index) {
+                      Artisan item = filteredArtisans[index];
+                      return InkWell(
+                        onTap: () {
+                          Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) =>
+                                      DetailArtisan(artisan: item)));
+                        },
+                        child: Container(
+                          margin: EdgeInsets.all(5),
+                          decoration: BoxDecoration(
+                              color: Colors.white,
+                              borderRadius: BorderRadius.circular(30)),
                           child: ListTile(
                             leading: FaIcon(
                               FontAwesomeIcons.circleUser,
@@ -202,18 +380,136 @@ class _SearchState extends State<Search> {
                               onTap: () {},
                             ),
                           ),
-                        );
+                        ),
+                      );
+                    },
+                    itemCount: filteredArtisans.length,
+                  )),
+      ],
+    );
+  }
+}
+
+class CustomSearchDelegate extends SearchDelegate {
+  List<Artisan> listArtisans = Artisan.getArtisans();
+
+  @override
+  List<Widget>? buildActions(BuildContext context) {
+    return [
+      IconButton(
+          onPressed: () {
+            query = '';
+          },
+          icon: Icon(
+            Icons.clear,
+            color: Colors.white,
+          ))
+    ];
+  }
+
+  @override
+  Widget? buildLeading(BuildContext context) {
+    return IconButton(
+        onPressed: () {
+          close(context, null);
+        },
+        icon: Icon(
+          Icons.arrow_back_rounded,
+          color: Colors.white,
+        ));
+  }
+
+  @override
+  Widget buildResults(BuildContext context) {
+    List<Artisan> filteredArtisans = listArtisans
+        .where((artisan) =>
+            artisan.professionName
+                .toLowerCase()
+                .contains(query.toLowerCase()) ||
+            artisan.Surname.toLowerCase().contains(query.toLowerCase()) ||
+            artisan.forename.toLowerCase().contains(query.toLowerCase()))
+        .toList();
+    return Column(children: [
+      Expanded(
+          //height: size.height * .4,
+          child: filteredArtisans.length == 0
+              ? Center(
+                  child: Lottie.asset(
+                      'assets/animations/lf30_editor_8djg3wcl.json'))
+              : ListView.builder(
+                  itemBuilder: (BuildContext context, int index) {
+                    Artisan item = filteredArtisans[index];
+                    return InkWell(
+                      onTap: () {
+                        Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) =>
+                                    DetailArtisan(artisan: item)));
                       },
-                      itemCount: filteredArtisans.length,
-                    )),
-          /*  Stack(
-                    children: [ DraggableScrollableSheet(builder: (BuildContext context, ScrollController scroller){
-                      return Container(color: Colors.white,height:  size.height* .3,);
-                    }, minChildSize: size.height* .3,
-                    initialChildSize: size.height* .4,),
-       ] ) */
-        ],
-      ))
-    ]));
+                      child: ListTile(
+                        leading: FaIcon(
+                          FontAwesomeIcons.circleUser,
+                          size: 50,
+                        ),
+                        title: Text(item.Surname + " " + item.forename),
+                        subtitle: Text(item.professionName),
+                        trailing: GestureDetector(
+                          child: FaIcon(FontAwesomeIcons.heart),
+                          onTap: () {},
+                        ),
+                      ),
+                    );
+                  },
+                  itemCount: filteredArtisans.length,
+                )),
+    ]);
+  }
+
+  @override
+  Widget buildSuggestions(BuildContext context) {
+    List<Artisan> filteredArtisans = listArtisans
+        .where((artisan) =>
+            artisan.professionName
+                .toLowerCase()
+                .contains(query.toLowerCase()) ||
+            artisan.Surname.toLowerCase().contains(query.toLowerCase()) ||
+            artisan.forename.toLowerCase().contains(query.toLowerCase()))
+        .toList();
+    return Column(children: [
+      Expanded(
+          //height: size.height * .4,
+          child: filteredArtisans.length == 0
+              ? Center(
+                  child: Lottie.asset(
+                      'assets/animations/lf30_editor_8djg3wcl.json'))
+              : ListView.builder(
+                  itemBuilder: (BuildContext context, int index) {
+                    Artisan item = filteredArtisans[index];
+                    return InkWell(
+                      onTap: () {
+                        Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) =>
+                                    DetailArtisan(artisan: item)));
+                      },
+                      child: ListTile(
+                        leading: FaIcon(
+                          FontAwesomeIcons.circleUser,
+                          size: 50,
+                        ),
+                        title: Text(item.Surname + " " + item.forename),
+                        subtitle: Text(item.professionName),
+                        trailing: GestureDetector(
+                          child: FaIcon(FontAwesomeIcons.heart),
+                          onTap: () {},
+                        ),
+                      ),
+                    );
+                  },
+                  itemCount: filteredArtisans.length,
+                )),
+    ]);
   }
 }

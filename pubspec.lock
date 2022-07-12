@@ -303,6 +303,13 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "4.2.4"
+  searchfield:
+    dependency: "direct main"
+    description:
+      name: searchfield
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "0.6.6"
   shared_preferences:
     dependency: "direct main"
     description:
@@ -364,6 +371,13 @@ packages:
     description: flutter
     source: sdk
     version: "0.0.99"
+  sliding_up_panel2:
+    dependency: "direct main"
+    description:
+      name: sliding_up_panel2
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "3.2.2"
   source_span:
     dependency: transitive
     description:
