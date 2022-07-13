@@ -88,7 +88,7 @@ class _SearchState extends State<Search> {
   @override
   Widget build(BuildContext context) {
     Size size = MediaQuery.of(context).size;
-    _panelHeightOpen = size.height * .45;
+    _panelHeightOpen = size.height * .6;
 
     return Scaffold(
       appBar: AppBar(
@@ -208,9 +208,10 @@ class _SearchState extends State<Search> {
                         onChanged: (val) {
                           setState(() {
                             _filterKind = val;
-                           // panelController.
-                            _panelHeightOpen =
-                                MediaQuery.of(context).size.height * .45;
+
+                            // _panelHeightOpen = MediaQuery.of(context).size.height * .45;
+                            panelController.animatePanelToPosition(0.72,
+                                duration: Duration(microseconds: 70));
                             print('Filter: $_filterKind');
                           });
                         })),
@@ -229,8 +230,9 @@ class _SearchState extends State<Search> {
                         onChanged: (val) {
                           setState(() {
                             _filterKind = val;
-                            _panelHeightOpen =
-                                MediaQuery.of(context).size.height * .60;
+                             _panelHeightOpen = MediaQuery.of(context).size.height * .60;
+                            panelController.animatePanelToPosition(0.96,
+                                duration: Duration(microseconds: 70));
                             print('Filter: $_filterKind');
                           });
                         })),
@@ -357,7 +359,7 @@ class _SearchState extends State<Search> {
                           ),
                         ),
                   SizedBox(
-                    height: MediaQuery.of(context).size.height* .00001,
+                    height: MediaQuery.of(context).size.height * .00001,
                   ),
                   InkWell(
                     hoverColor: Colors.orange,
