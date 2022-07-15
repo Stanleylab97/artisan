@@ -15,6 +15,7 @@ import 'package:lottie/lottie.dart';
 import 'package:searchfield/searchfield.dart';
 import 'package:sliding_up_panel2/sliding_up_panel2.dart';
 import 'package:substring_highlight/substring_highlight.dart';
+import '../models/arrondissement.dart';
 import '../models/artisan.dart' show Artisan, UserModel;
 
 class Search extends StatefulWidget {
@@ -33,7 +34,7 @@ class _SearchState extends State<Search> {
 
   late TextEditingController controller = TextEditingController();
 
-  late List<String> param = ['', '', ''];
+  late List<String> param = ['', '', '',''];
 
   bool? _filterKind = false;
 
@@ -88,7 +89,7 @@ class _SearchState extends State<Search> {
   @override
   Widget build(BuildContext context) {
     Size size = MediaQuery.of(context).size;
-    _panelHeightOpen = size.height * .6;
+    _panelHeightOpen = size.height * .7;
 
     return Scaffold(
       appBar: AppBar(
@@ -261,12 +262,12 @@ class _SearchState extends State<Search> {
                             child: SearchField(
                               //controller: _selectedDepartement,
                               onSuggestionTap: (x) {
-                                param[2] = Metier.getMetiers()
+                                param[0] = Metier.getMetiers()
                                     .firstWhere(
                                         (element) => element.nom == x.searchKey)
                                     .code;
 
-                                print(param[2]);
+                                print(param[0]);
                               },
                               hint: 'Entrez le métier',
                               searchStyle: TextStyle(
@@ -298,66 +299,7 @@ class _SearchState extends State<Search> {
                       ],
                     ),
                   ),
-                  _filterKind == true
-                      ? CompleteFilter(param: param)
-                      : Padding(
-                          padding: EdgeInsets.only(top: 20, bottom: 20),
-                          child: Row(
-                            children: [
-                              Text(
-                                "Commune:",
-                                style: TextStyle(
-                                    fontSize: 16, color: Colors.white),
-                              ),
-                              SizedBox(
-                                width: 15,
-                              ),
-                              Expanded(
-                                child: Container(
-                                  child: SearchField(
-                                    // controller: _selectedcommune,
-                                    onSuggestionTap: (x) {
-                                      param[1] = Commune.getCommunes()
-                                          .firstWhere((element) =>
-                                              element.nom == x.searchKey)
-                                          .code;
-                                    },
-                                    hint: 'Saisissez la commune',
-                                    searchStyle: TextStyle(
-                                      fontSize: 18,
-                                      color: Colors.white.withOpacity(0.8),
-                                    ),
-                                    //onSuggestionTap:,
-                                    suggestions: Commune.getCommunes()
-                                        .where((commune) =>
-                                            commune.departementCode == param[0])
-                                        .map((e) => SearchFieldListItem(e.nom,
-                                            child: Text(e.nom)))
-                                        .toList(),
-                                    searchInputDecoration: InputDecoration(
-                                        hintStyle:
-                                            TextStyle(color: Colors.white),
-                                        enabledBorder: OutlineInputBorder(
-                                            borderSide: BorderSide(
-                                                color: Colors.white, width: 1),
-                                            borderRadius:
-                                                BorderRadius.circular(10)),
-                                        focusedBorder: OutlineInputBorder(
-                                            borderSide: BorderSide(
-                                                color: Colors.white, width: 2),
-                                            borderRadius:
-                                                BorderRadius.circular(10))),
-                                    itemHeight: 50,
-                                    suggestionsDecoration: BoxDecoration(
-                                        color: Colors.white,
-                                        borderRadius:
-                                            BorderRadius.circular(10)),
-                                  ),
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
+                  CompleteFilter(param: param),
                   SizedBox(
                     height: MediaQuery.of(context).size.height * .00001,
                   ),
@@ -369,12 +311,13 @@ class _SearchState extends State<Search> {
                     onTap: () {
                       setState(() {
                         print(
-                            '${param[2]} de  ${param[0]} in commune ${param[1]}');
+                            '${param[0]} de  ${param[1]} in commune ${param[2]}');
                         filteredArtisans = filteredArtisans
                             .where((artisan) =>
-                                artisan.professionCode == param[2] &&
-                                artisan.addrDept == param[0] &&
-                                artisan.commune == param[1])
+                                artisan.professionCode == param[0] &&
+                                artisan.addrDept == param[1] &&
+                                artisan.commune == param[2] &&
+                                artisan.commune == param[3])
                             .toList();
                         print('Liste filtrée: ${filteredArtisans.length}');
                       });
@@ -481,7 +424,7 @@ class CompleteFilter extends StatelessWidget {
                   child: SearchField(
                     // controller: _selectedcommune,
                     onSuggestionTap: (x) {
-                      param[1] = Commune.getCommunes()
+                      param[2] = Commune.getCommunes()
                           .firstWhere((element) => element.nom == x.searchKey)
                           .code;
                     },
@@ -493,6 +436,57 @@ class CompleteFilter extends StatelessWidget {
                     //onSuggestionTap:,
                     suggestions: Commune.getCommunes()
                         .where((commune) => commune.departementCode == param[0])
+                        .map((e) =>
+                            SearchFieldListItem(e.nom, child: Text(e.nom)))
+                        .toList(),
+                    searchInputDecoration: InputDecoration(
+                        hintStyle: TextStyle(color: Colors.white),
+                        enabledBorder: OutlineInputBorder(
+                            borderSide:
+                                BorderSide(color: Colors.white, width: 1),
+                            borderRadius: BorderRadius.circular(10)),
+                        focusedBorder: OutlineInputBorder(
+                            borderSide:
+                                BorderSide(color: Colors.white, width: 2),
+                            borderRadius: BorderRadius.circular(10))),
+                    itemHeight: 50,
+                    suggestionsDecoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(10)),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+         Padding(
+          padding: EdgeInsets.only(top: 20, bottom: 20),
+          child: Row(
+            children: [
+              Text(
+                "Arrondissement:",
+                style: TextStyle(fontSize: 16, color: Colors.white),
+              ),
+              SizedBox(
+                width: 15,
+              ),
+              Expanded(
+                child: Container(
+                  child: SearchField(
+                    // controller: _selectedcommune,
+                    onSuggestionTap: (x) {
+                      param[3] = Arrondissement.getArrondissements()
+                          .firstWhere((element) => element.nom == x.searchKey)
+                          .code;
+                    },
+                    hint: 'Saisissez l\'arrondissement',
+                    searchStyle: TextStyle(
+                      fontSize: 18,
+                      color: Colors.white.withOpacity(0.8),
+                    ),
+                    //onSuggestionTap:,
+                    suggestions: Arrondissement.getArrondissements()
+                        .where((arrondissemt) => arrondissemt.codeCommune == param[2])
                         .map((e) =>
                             SearchFieldListItem(e.nom, child: Text(e.nom)))
                         .toList(),
