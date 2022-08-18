@@ -4899,7 +4899,7 @@ class Artisan {
           "birthDept": "08",
           "birthAddrVilCode": "03.0.00.00",
           "BirthAddrArrondCode": "03.0.00",
-          "commune": "0300",
+          "commune": "0301",
           "addrCommCode": "03.0",
           "addrDept": "03",
           "BusinessCode": "483",

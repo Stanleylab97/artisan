@@ -36,15 +36,18 @@ class _DetailArtisanState extends State<DetailArtisan> {
                         child: Column(children: [
                           Row(
                             children: [
-                              Container(
-                                width: MediaQuery.of(context).size.width * .5,
-                                height:
-                                    MediaQuery.of(context).size.height * .28,
-                                decoration: BoxDecoration(
-                                    image: DecorationImage(
-                                        image: AssetImage(
-                                            "assets/images/populars/peintre.jpg"),
-                                        fit: BoxFit.cover)),
+                              Hero(tag: 'artisan',
+                              // transitionOnUserGestures: true,
+                                child: Container(
+                                  width: MediaQuery.of(context).size.width * .5,
+                                  height:
+                                      MediaQuery.of(context).size.height * .28,
+                                  decoration: const BoxDecoration(
+                                      image:   DecorationImage(
+                                          image:  AssetImage(
+                                              "assets/images/populars/peintre.jpg"),
+                                          fit: BoxFit.cover)),
+                                ),
                               ),
                               SizedBox(
                                 width: 10,
