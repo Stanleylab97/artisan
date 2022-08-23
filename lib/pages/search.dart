@@ -34,12 +34,10 @@ class _SearchState extends State<Search> {
   late List<Artisan> filteredArtisans;
 
   late TextEditingController controller = TextEditingController();
-    late TextEditingController metierC = TextEditingController();
-    late TextEditingController depC = TextEditingController();
-    late TextEditingController commC = TextEditingController();
-    late TextEditingController arrC = TextEditingController();
-
-
+  late TextEditingController metierC = TextEditingController();
+  late TextEditingController depC = TextEditingController();
+  late TextEditingController commC = TextEditingController();
+  late TextEditingController arrC = TextEditingController();
 
   late List<String> param = ['', '', '', ''];
 
@@ -189,7 +187,7 @@ class _SearchState extends State<Search> {
             ),
             Row(
               children: <Widget>[
-                SizedBox(width: MediaQuery.of(context).size.width * 0.3),
+                SizedBox(width: MediaQuery.of(context).size.width * 0.28),
                 Center(
                   child: Text(
                     "Recherche avancée",
@@ -199,17 +197,22 @@ class _SearchState extends State<Search> {
                         color: Colors.white),
                   ),
                 ),
-                SizedBox(width: MediaQuery.of(context).size.width * 0.15),
-                InkWell(child: FaIcon(FontAwesomeIcons.arrowRotateRight, color: Colors.white,), onTap: (){
-                  setState(() {
-                  param=['','','',''];
-                   metierC.clear();
-                   depC.clear();
-                   commC.clear();
-                   arrC.clear();
-                   print('Values cleaned');
-                  });
-                   })
+                SizedBox(width: MediaQuery.of(context).size.width * 0.08),
+                InkWell(
+                    child: FaIcon(
+                      FontAwesomeIcons.arrowRotateRight,
+                      color: Colors.white,
+                    ),
+                    onTap: () {
+                      setState(() {
+                        param = ['', '', '', ''];
+                        metierC.clear();
+                        depC.clear();
+                        commC.clear();
+                        arrC.clear();
+                        print('Values cleaned');
+                      });
+                    })
               ],
             ),
             SizedBox(height: MediaQuery.of(context).size.height * 0.001),
@@ -273,7 +276,8 @@ class _SearchState extends State<Search> {
                       ],
                     ),
                   ),
-                  CompleteFilter(param: param, depC:depC, commC:commC, arrC:arrC ),
+                  CompleteFilter(
+                      param: param, depC: depC, commC: commC, arrC: arrC),
                   SizedBox(
                     height: MediaQuery.of(context).size.height * .00001,
                   ),
@@ -284,8 +288,44 @@ class _SearchState extends State<Search> {
                     highlightColor: Colors.purple,
                     onTap: () {
                       setState(() {
-                        if (param[0] != "") {
-                          if (param[1] != "") {
+                        if (param[0] != "" && param[1] != "") {
+                          if (param[2] != "" && param[3] != "") {
+                            print(
+                                'Metier: ${param[0]} de  ${param[1]} in commune ${param[2]} & arrondissement ${param[3]}');
+                            filteredArtisans = listArtisans
+                                .where((artisan) =>
+                                        artisan.professionCode == param[0] &&
+                                        artisan.addrDept == param[1] &&
+                                        artisan.commune == param[2] //&&
+                                    //artisan.addrDept == param[3]
+                                    )
+                                .toList();
+                          }
+
+                          if (param[2] != "" && param[3] == "") {
+                            print(
+                                'Metier: ${param[0]} de  ${param[1]} in commune ${param[2]}');
+                            filteredArtisans = listArtisans
+                                .where((artisan) =>
+                                        artisan.professionCode == param[0] &&
+                                        artisan.addrDept == param[1] &&
+                                        artisan.commune == param[2] //&&
+                                    //artisan.addrDept == param[3]
+                                    )
+                                .toList();
+                          }
+
+                          if (param[2] == "" && param[3] == "") {
+                            print(
+                                'Metier: ${param[0]} de departemement  ${param[1]} ');
+                            filteredArtisans = listArtisans
+                                .where((artisan) =>
+                                    artisan.professionCode == param[0] &&
+                                    artisan.addrDept == param[1])
+                                .toList();
+                          }
+
+                          /* if (param[1] != "") {
                             if (param[2] != "" && param[3] != "") {
                               print('Metier: ${param[0]} de  ${param[1]} in commune ${param[2]} & arrondissement ${param[3]}');
                               filteredArtisans = listArtisans
@@ -326,10 +366,11 @@ class _SearchState extends State<Search> {
                               print(
                                   'Liste filtrée: ${filteredArtisans.length}');
                             }
-                          }
+                          } */
                         } else {
                           Flushbar(
-                            message: "Un métier doit être sélectionné",
+                            message:
+                                "Veuillez définir le métier et le département",
                             icon: Icon(
                               Icons.info_outline,
                               size: 28.0,
@@ -341,6 +382,10 @@ class _SearchState extends State<Search> {
                       });
                       setState(() {
                         param = ['', '', '', ''];
+                        metierC.clear();
+                        depC.clear();
+                        commC.clear();
+                        arrC.clear();
                       });
                       panelController.close();
                     },
@@ -368,20 +413,21 @@ class _SearchState extends State<Search> {
 }
 
 class CompleteFilter extends StatelessWidget {
-  const CompleteFilter({
-    Key? key,
-    required this.param, required this.depC, required this.commC, required this.arrC
-  }) : super(key: key);
+  const CompleteFilter(
+      {Key? key,
+      required this.param,
+      required this.depC,
+      required this.commC,
+      required this.arrC})
+      : super(key: key);
 
   final List<String> param;
-   final TextEditingController depC;
-   final TextEditingController commC ;
-    final TextEditingController arrC ;
-
+  final TextEditingController depC;
+  final TextEditingController commC;
+  final TextEditingController arrC;
 
   @override
   Widget build(BuildContext context) {
-      
     return Column(
       children: [
         Padding(
@@ -396,7 +442,7 @@ class CompleteFilter extends StatelessWidget {
               Expanded(
                 child: Container(
                   child: SearchField(
-                   controller: depC,
+                    controller: depC,
                     onSuggestionTap: (x) {
                       param[1] = Departement.getDepartements()
                           .firstWhere((element) => element.nom == x.searchKey)
@@ -448,11 +494,19 @@ class CompleteFilter extends StatelessWidget {
               Expanded(
                 child: Container(
                   child: SearchField(
-                     controller: commC,
+                    controller: commC,
                     onSuggestionTap: (x) {
                       param[2] = Commune.getCommunes()
                           .firstWhere((element) => element.nom == x.searchKey)
                           .code;
+
+                      param[1] = Commune.getCommunes()
+                          .firstWhere((element) => element.nom == x.searchKey)
+                          .departementCode;
+
+                      depC.text = Departement.getDepartements()
+                          .firstWhere((element) => element.code == param[1])
+                          .nom;
                     },
                     hint: 'Saisissez la commune',
                     searchStyle: TextStyle(
@@ -505,7 +559,7 @@ class CompleteFilter extends StatelessWidget {
               Expanded(
                 child: Container(
                   child: SearchField(
-                     controller: arrC,
+                    controller: arrC,
                     onSuggestionTap: (x) {
                       param[3] = Arrondissement.getArrondissements()
                           .firstWhere((element) => element.nom == x.searchKey)

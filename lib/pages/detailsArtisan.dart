@@ -6,8 +6,10 @@ import 'package:artisan/models/populaire.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 
 import '../models/commune.dart';
+import 'artisan_location.dart';
 
 class DetailArtisan extends StatefulWidget {
   DetailArtisan({Key? key, required this.artisan}) : super(key: key);
@@ -36,15 +38,16 @@ class _DetailArtisanState extends State<DetailArtisan> {
                         child: Column(children: [
                           Row(
                             children: [
-                              Hero(tag: 'artisan',
-                              // transitionOnUserGestures: true,
+                              Hero(
+                                tag: 'artisan',
+                                // transitionOnUserGestures: true,
                                 child: Container(
                                   width: MediaQuery.of(context).size.width * .5,
                                   height:
                                       MediaQuery.of(context).size.height * .28,
                                   decoration: const BoxDecoration(
-                                      image:   DecorationImage(
-                                          image:  AssetImage(
+                                      image: DecorationImage(
+                                          image: AssetImage(
                                               "assets/images/populars/peintre.jpg"),
                                           fit: BoxFit.cover)),
                                 ),
@@ -94,8 +97,7 @@ class _DetailArtisanState extends State<DetailArtisan> {
                                           Text('Description :')
                                         ],
                                       ),
-                                      Text(widget.artisan
-                                          .BusinessDesc) 
+                                      Text(widget.artisan.BusinessDesc)
                                     ],
                                   ),
                                 ),
@@ -288,7 +290,21 @@ class _DetailArtisanState extends State<DetailArtisan> {
                                         fontWeight: FontWeight.normal,
                                         fontSize: 18)),
                               ],
-                            )
+                            ),
+                            SizedBox(
+                                height:
+                                    MediaQuery.of(context).size.height * .01),
+                            ElevatedButton.icon(
+                              onPressed: () {
+                                Navigator.push(context, MaterialPageRoute(builder: (context)=>MapPage(name: this.widget.artisan.Surname, prenom: this.widget.artisan.forename, metier: this.widget.artisan.professionName, photo: "", position: LatLng(6.375608,2.371123))));
+                              },
+                             icon:FaIcon(FontAwesomeIcons.mapLocation),
+                              label: const Text(
+                                'Voir sur la carte',
+                                style: TextStyle(
+                                    color: Colors.white, fontSize: 24),
+                              ), // <-- Text
+                            ),
                           ],
                         ),
                       ),

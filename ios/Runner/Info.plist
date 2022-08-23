@@ -47,5 +47,11 @@
 		<true/>
 		<key>UIStatusBarHidden</key>
 		<false/>
+		<key>NSLocationAlwaysUsageDescription</key>
+		<string>Needed to access location</string>
+		<key>NSLocationWhenInUseUsageDescription</key>
+		<string>Needed to access location</string>
+		<key>com.apple.security.network.client</key>
+		<true/>
 	</dict>
 </plist>

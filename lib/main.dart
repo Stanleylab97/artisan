@@ -1,6 +1,7 @@
 import 'package:artisan/models/populaire.dart';
 import 'package:artisan/pages/detailsArtisan.dart';
 import 'package:artisan/pages/search.dart';
+import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -61,8 +62,9 @@ class _MyHomePageState extends State<MyHomePage> {
 
   @override
   Widget build(BuildContext context) {
-    List<Artisan> x= Artisan.getArtisans();
-    print('Nombre d\'artisans: ${x.length} Départements: ${Departement.getDepartements().length} Communes : ${Commune.getCommunes().length} ');
+    List<Artisan> x = Artisan.getArtisans();
+    print(
+        'Nombre d\'artisans: ${x.length} Départements: ${Departement.getDepartements().length} Communes : ${Commune.getCommunes().length} ');
     Size size = MediaQuery.of(context).size;
 
     return Scaffold(
@@ -76,14 +78,16 @@ class _MyHomePageState extends State<MyHomePage> {
                 children: [
                   Image.asset('assets/images/fda_logo.png',
                       width: size.width * .22, height: size.height * .1),
-                  GestureDetector(child: FaIcon(
-                    FontAwesomeIcons.magnifyingGlass,
-                    size: 30,
-                  ),
-                  onTap: (){
-                    Navigator.push(context, MaterialPageRoute(builder: (context) =>  Search()));
-                  },
-                  ) 
+                  GestureDetector(
+                    child: FaIcon(
+                      FontAwesomeIcons.magnifyingGlass,
+                      size: 30,
+                    ),
+                    onTap: () {
+                      Navigator.push(context,
+                          MaterialPageRoute(builder: (context) => Search()));
+                    },
+                  )
                 ],
               ),
               SizedBox(height: size.height * .02),
@@ -111,11 +115,11 @@ class _MyHomePageState extends State<MyHomePage> {
                     decoration: BoxDecoration(
                         color: Color.fromRGBO(205, 54, 39, 1),
                         borderRadius: BorderRadius.circular(20)),
-                    child: Text(
+                    child: AutoSizeText(
                       'Populaires',
                       textAlign: TextAlign.center,
                       style:
-                          GoogleFonts.lexend(color: Colors.white, fontSize: 23),
+                          GoogleFonts.lexend(color: Colors.white, fontSize: 20),
                     ),
                   ),
                 ],
@@ -128,7 +132,7 @@ class _MyHomePageState extends State<MyHomePage> {
                 mainAxisSpacing: 30,
                 children: _listItem
                     .map((item) => GestureDetector(
-                      child: Card(
+                          child: Card(
                             color: Colors.transparent,
                             elevation: 0,
                             child: Column(
@@ -144,22 +148,26 @@ class _MyHomePageState extends State<MyHomePage> {
                                       image: DecorationImage(
                                           image: AssetImage(item.image),
                                           fit: BoxFit.cover)),
-                                  child:Transform.translate(
-                          offset: Offset(50, -50),
-                          child: Container(
-                            margin: EdgeInsets.symmetric(horizontal: 65, vertical: 63),
-                            decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(10),
-                              color: Colors.white
-                            ),
-                            child: Icon(Icons.bookmark_border, size: 15,),
-                          ),
-                        ),
+                                  child: Transform.translate(
+                                    offset: Offset(50, -50),
+                                    child: Container(
+                                      margin: EdgeInsets.symmetric(
+                                          horizontal: 65, vertical: 63),
+                                      decoration: BoxDecoration(
+                                          borderRadius:
+                                              BorderRadius.circular(10),
+                                          color: Colors.white),
+                                      child: Icon(
+                                        Icons.bookmark_border,
+                                        size: 15,
+                                      ),
+                                    ),
+                                  ),
                                 ),
                                 Row(
                                   mainAxisAlignment: MainAxisAlignment.center,
                                   children: [
-                                    Text(
+                                    AutoSizeText(
                                       item.nom + ' ' + item.prenom,
                                       style: GoogleFonts.lexend(
                                           color: Colors.black, fontSize: 15),
@@ -172,18 +180,18 @@ class _MyHomePageState extends State<MyHomePage> {
                                     Text(
                                       item.profession,
                                       style: GoogleFonts.lexend(
-                                          color: Colors.grey[700], fontSize: 13),
+                                          color: Colors.grey[700],
+                                          fontSize: 13),
                                     )
                                   ],
                                 ),
                               ],
                             ),
                           ),
-                          onTap:(){
+                          onTap: () {
                             // Navigator.push(context, MaterialPageRoute(builder: (context) =>  DetailArtisan(artisan:item)));
-                          }                    
-,
-                    ))
+                          },
+                        ))
                     .toList(),
               ))
             ],
