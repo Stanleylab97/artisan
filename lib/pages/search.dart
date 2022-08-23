@@ -526,10 +526,7 @@ class CompleteFilter extends StatelessWidget {
                             .map((e) =>
                                 SearchFieldListItem(e.nom, child: Text(e.nom)))
                             .toList()
-                        : Arrondissement.getArrondissements()
-                            .map((e) =>
-                                SearchFieldListItem(e.nom, child: Text(e.nom)))
-                            .toList(),
+                        : [],
                     searchInputDecoration: InputDecoration(
                         hintStyle: TextStyle(color: Colors.white),
                         enabledBorder: OutlineInputBorder(
