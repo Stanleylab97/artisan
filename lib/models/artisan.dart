@@ -23,7 +23,8 @@ class Artisan {
       BusinessDesc,
       fatherSurname,
       fatherForename,
-      fatherBirthDate;
+      fatherBirthDate,
+      ifu;
   late String motherSurname,
       motherForename,
       motherBirthDate,
@@ -68,7 +69,8 @@ class Artisan {
       required this.professionCode,
       required this.professionName,
       required this.workAddr1,
-      required this.workAddr2});
+      required this.workAddr2,
+      required this.ifu});
 
 
   factory Artisan.fromJson(dynamic json) {
@@ -82,6 +84,7 @@ class Artisan {
         forename1:  json['forename1'] ==null ? "" : json['forename1'] as String,
         birthDate: json['birthDate'] as String,
         birthPlace: json['birthPlace'] as String,
+        ifu: "20215879315",
         address: json['address'] as String,
         blobData: json['blobData'] as String,
         birthVilCode: json['birthVilCode'] as String,
@@ -143,6 +146,7 @@ class Artisan {
     data['professionName'] = this.professionName;
     data['workAddr1'] = this.workAddr1;
     data['workAddr2'] = this.workAddr2;
+    data['ifu'] = this.ifu;
     return data;
   }
 

@@ -97,7 +97,9 @@ class _DetailArtisanState extends State<DetailArtisan> {
                                       ),
                                       Row(
                                         children: [
-                                          FaIcon(widget.artisan.gender == "F" ? FontAwesomeIcons.venus : FontAwesomeIcons.mars),
+                                          FaIcon(widget.artisan.gender == "F"
+                                              ? FontAwesomeIcons.venus
+                                              : FontAwesomeIcons.mars),
                                           SizedBox(
                                             width: 10,
                                           ),
@@ -129,7 +131,7 @@ class _DetailArtisanState extends State<DetailArtisan> {
                             height: 15,
                           ),
                           Row(
-                            mainAxisAlignment: MainAxisAlignment.start,
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
                               Text(
                                 widget.artisan.Surname +
@@ -140,20 +142,22 @@ class _DetailArtisanState extends State<DetailArtisan> {
                                 ),
                               ),
                               SizedBox(width: 27),
-                              FaIcon(FontAwesomeIcons.phone),
-                              SizedBox(
-                                width: 10,
-                              ),
-                              GestureDetector(
-                                child: Text(widget.artisan.phone),
-                                onTap: () async {
-                                  final url = Uri.parse("tel:"+ widget.artisan.phone);
+                              FloatingActionButton.extended(
+                                label: Text(
+                                  'Appeler',
+                                  style: TextStyle(color: Colors.white),
+                                ), // <-- Text
+                                backgroundColor: Colors.blue,
+                                icon: FaIcon(FontAwesomeIcons.phone),
+                                onPressed: () async {
+                                  final url =
+                                      Uri.parse("tel:" + widget.artisan.phone);
                                   if (await canLaunchUrl(url))
                                     await launchUrl(url);
                                   else
                                     throw 'Could not launch';
                                 },
-                              )
+                              ),
                             ],
                           ),
                           Row(
@@ -385,6 +389,28 @@ class _DetailArtisanState extends State<DetailArtisan> {
                                             widget.artisan.lepiCardNum == "")
                                         ? "Non renseigné"
                                         : widget.artisan.lepiCardNum,
+                                    style: TextStyle(
+                                        fontWeight: FontWeight.normal,
+                                        fontSize: 18)),
+                              ],
+                            ),
+                            SizedBox(
+                                height:
+                                    MediaQuery.of(context).size.height * .03),
+                            Row(
+                              children: [
+                                Text("IFU : ",
+                                    style: TextStyle(
+                                        fontWeight: FontWeight.bold,
+                                        fontSize: 18)),
+                                SizedBox(
+                                    width: MediaQuery.of(context).size.width *
+                                        .28),
+                                Text(
+                                    (widget.artisan.ifu == null ||
+                                            widget.artisan.ifu == "")
+                                        ? "Non renseigné"
+                                        : widget.artisan.ifu,
                                     style: TextStyle(
                                         fontWeight: FontWeight.normal,
                                         fontSize: 18)),
