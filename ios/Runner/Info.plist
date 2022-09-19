@@ -53,5 +53,10 @@
 		<string>Needed to access location</string>
 		<key>com.apple.security.network.client</key>
 		<true/>
+		<key>LSApplicationQueriesSchemes</key>
+		<array>
+		<string>sms</string>
+		<string>tel</string>
+		</array>
 	</dict>
 </plist>

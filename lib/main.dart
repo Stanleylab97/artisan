@@ -8,6 +8,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:artisan/models/artisan.dart';
 import 'package:artisan/models/commune.dart';
 import 'package:artisan/models/departement.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 void main() {
   runApp(const MyApp());
@@ -67,17 +68,38 @@ class _MyHomePageState extends State<MyHomePage> {
         'Nombre d\'artisans: ${x.length} Départements: ${Departement.getDepartements().length} Communes : ${Commune.getCommunes().length} ');
     Size size = MediaQuery.of(context).size;
 
+    Future<void> _launchInBrowser(Uri url) async {
+      if (!await launchUrl(
+        url,
+        mode: LaunchMode.externalApplication,
+      )) {
+        throw 'Could not launch $url';
+      }
+    }
+
+    final Uri toLaunch =
+        Uri(scheme: 'https', host: 'www.fda.bj', path: 'headers/');
+    Future<void>? _launched;
+
     return Scaffold(
       body: SafeArea(
         child: Padding(
-          padding: const EdgeInsets.only(top: 15, left: 10, right: 10),
+          padding: const EdgeInsets.only(top: 5, left: 10, right: 10),
           child: Column(
             children: [
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Image.asset('assets/images/fda_logo.png',
-                      width: size.width * .22, height: size.height * .1),
+                  GestureDetector(
+                      child: Image.asset('assets/images/MPMEPE-01.png',
+                          width: size.width * .22, height: size.height * .1),
+                      onTap: (() async {
+                        final url = Uri.parse('https://pmepe.gouv.bj/');
+                        if (await canLaunchUrl(url))
+                          await launchUrl(url);
+                        else
+                          throw 'Could not launch';
+                      })),
                   GestureDetector(
                     child: FaIcon(
                       FontAwesomeIcons.magnifyingGlass,
@@ -87,7 +109,17 @@ class _MyHomePageState extends State<MyHomePage> {
                       Navigator.push(context,
                           MaterialPageRoute(builder: (context) => Search()));
                     },
-                  )
+                  ),
+                  GestureDetector(
+                    child: Image.asset('assets/images/fda_logo.png',
+                        width: size.width * .22, height: size.height * .1),
+                    onTap: (() async {
+                        final url = Uri.parse('https://fda.bj/');
+                        if (await canLaunchUrl(url))
+                          await launchUrl(url);
+                        else
+                          throw 'Could not launch';
+                      })),
                 ],
               ),
               SizedBox(height: size.height * .02),

@@ -7,7 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
-
+import 'package:url_launcher/url_launcher.dart';
 import '../models/commune.dart';
 import 'artisan_location.dart';
 
@@ -20,6 +20,27 @@ class DetailArtisan extends StatefulWidget {
 }
 
 class _DetailArtisanState extends State<DetailArtisan> {
+  bool _hasCallSupport = false;
+  Future<void>? _launched;
+
+  Future<void> _makePhoneCall(String phoneNumber) async {
+    final Uri launchUri = Uri(
+      scheme: 'tel',
+      path: phoneNumber,
+    );
+    await launchUrl(launchUri);
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    canLaunchUrl(Uri(scheme: 'tel', path: '123')).then((bool result) {
+      setState(() {
+        _hasCallSupport = result;
+      });
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     Row firstCard(BuildContext context) {
@@ -76,7 +97,7 @@ class _DetailArtisanState extends State<DetailArtisan> {
                                       ),
                                       Row(
                                         children: [
-                                          FaIcon(FontAwesomeIcons.marsAndVenus),
+                                          FaIcon(widget.artisan.gender == "F" ? FontAwesomeIcons.venus : FontAwesomeIcons.mars),
                                           SizedBox(
                                             width: 10,
                                           ),
@@ -123,7 +144,16 @@ class _DetailArtisanState extends State<DetailArtisan> {
                               SizedBox(
                                 width: 10,
                               ),
-                              Text(widget.artisan.phone)
+                              GestureDetector(
+                                child: Text(widget.artisan.phone),
+                                onTap: () async {
+                                  final url = Uri.parse("tel:"+ widget.artisan.phone);
+                                  if (await canLaunchUrl(url))
+                                    await launchUrl(url);
+                                  else
+                                    throw 'Could not launch';
+                                },
+                              )
                             ],
                           ),
                           Row(
@@ -152,7 +182,7 @@ class _DetailArtisanState extends State<DetailArtisan> {
 
     Widget _tabSection(BuildContext context) {
       return DefaultTabController(
-          length: 3,
+          length: 2,
           child: Column(
             children: [
               Container(
@@ -173,9 +203,6 @@ class _DetailArtisanState extends State<DetailArtisan> {
                     Tab(
                       text: 'Identité',
                     ),
-                    Tab(
-                      text: 'Parents',
-                    )
                   ],
                 ),
               ),
@@ -296,9 +323,22 @@ class _DetailArtisanState extends State<DetailArtisan> {
                                     MediaQuery.of(context).size.height * .01),
                             ElevatedButton.icon(
                               onPressed: () {
-                                Navigator.push(context, MaterialPageRoute(builder: (context)=>MapPage(name: this.widget.artisan.Surname, prenom: this.widget.artisan.forename, metier: this.widget.artisan.professionName, photo: "", position: LatLng(6.375608,2.371123))));
+                                Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                        builder: (context) => MapPage(
+                                            name: this.widget.artisan.Surname,
+                                            prenom:
+                                                this.widget.artisan.forename,
+                                            metier: this
+                                                .widget
+                                                .artisan
+                                                .professionName,
+                                            photo: "",
+                                            position:
+                                                LatLng(6.375608, 2.371123))));
                               },
-                             icon:FaIcon(FontAwesomeIcons.mapLocation),
+                              icon: FaIcon(FontAwesomeIcons.mapLocation),
                               label: const Text(
                                 'Voir sur la carte',
                                 style: TextStyle(
@@ -396,137 +436,6 @@ class _DetailArtisanState extends State<DetailArtisan> {
                            Text("Rue 201, Marina",  style: TextStyle(fontWeight: FontWeight.normal, fontSize: 18)),
                         ],) 
  */
-                          ],
-                        ),
-                      ),
-                      Padding(
-                        padding:
-                            const EdgeInsets.only(left: 30, right: 10, top: 20),
-                        child: Column(
-                          children: [
-                            Center(
-                              child: Text(
-                                  "--------------------Père--------------------",
-                                  style: TextStyle(
-                                      fontWeight: FontWeight.bold,
-                                      fontSize: 18)),
-                            ),
-                            Row(
-                              children: [
-                                Text("Nom : ",
-                                    style: TextStyle(
-                                        fontWeight: FontWeight.bold,
-                                        fontSize: 18)),
-                                SizedBox(
-                                    width: MediaQuery.of(context).size.width *
-                                        .15),
-                                Text(widget.artisan.fatherSurname,
-                                    style: TextStyle(
-                                        fontWeight: FontWeight.normal,
-                                        fontSize: 18)),
-                              ],
-                            ),
-                            SizedBox(
-                                height:
-                                    MediaQuery.of(context).size.height * .03),
-                            Row(
-                              children: [
-                                Text("Prénom : ",
-                                    style: TextStyle(
-                                        fontWeight: FontWeight.bold,
-                                        fontSize: 18)),
-                                SizedBox(
-                                    width:
-                                        MediaQuery.of(context).size.width * .1),
-                                Text(widget.artisan.fatherForename,
-                                    style: TextStyle(
-                                        fontWeight: FontWeight.normal,
-                                        fontSize: 18)),
-                              ],
-                            ),
-                            SizedBox(
-                                height:
-                                    MediaQuery.of(context).size.height * .03),
-                            Row(
-                              children: [
-                                Text("Anniversaire : ",
-                                    style: TextStyle(
-                                        fontWeight: FontWeight.bold,
-                                        fontSize: 18)),
-                                SizedBox(
-                                    width: MediaQuery.of(context).size.width *
-                                        .003),
-                                Text(
-                                    widget.artisan.fatherBirthDate
-                                        .substring(0, 8),
-                                    style: TextStyle(
-                                        fontWeight: FontWeight.normal,
-                                        fontSize: 18)),
-                              ],
-                            ),
-                            SizedBox(
-                                height:
-                                    MediaQuery.of(context).size.height * .03),
-                            Center(
-                              child: Text(
-                                  "------------------Mère------------------",
-                                  style: TextStyle(
-                                      fontWeight: FontWeight.bold,
-                                      fontSize: 18)),
-                            ),
-                            Row(
-                              children: [
-                                Text("Nom : ",
-                                    style: TextStyle(
-                                        fontWeight: FontWeight.bold,
-                                        fontSize: 18)),
-                                SizedBox(
-                                    width: MediaQuery.of(context).size.width *
-                                        .15),
-                                Text(widget.artisan.motherSurname,
-                                    style: TextStyle(
-                                        fontWeight: FontWeight.normal,
-                                        fontSize: 18)),
-                              ],
-                            ),
-                            SizedBox(
-                                height:
-                                    MediaQuery.of(context).size.height * .03),
-                            Row(
-                              children: [
-                                Text("Prénom: ",
-                                    style: TextStyle(
-                                        fontWeight: FontWeight.bold,
-                                        fontSize: 18)),
-                                SizedBox(
-                                    width: MediaQuery.of(context).size.width *
-                                        .10),
-                                Text(widget.artisan.motherForename,
-                                    style: TextStyle(
-                                        fontWeight: FontWeight.normal,
-                                        fontSize: 18)),
-                              ],
-                            ),
-                            SizedBox(
-                                height:
-                                    MediaQuery.of(context).size.height * .03),
-                            Row(
-                              children: [
-                                Text("Anniversaire : ",
-                                    style: TextStyle(
-                                        fontWeight: FontWeight.bold,
-                                        fontSize: 18)),
-                                SizedBox(
-                                    width: MediaQuery.of(context).size.width *
-                                        .003),
-                                Text(
-                                    widget.artisan.motherBirthDate
-                                        .substring(0, 8),
-                                    style: TextStyle(
-                                        fontWeight: FontWeight.normal,
-                                        fontSize: 18)),
-                              ],
-                            )
                           ],
                         ),
                       ),
