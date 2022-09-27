@@ -56,13 +56,20 @@ class _LauncherState extends State<Launcher> {
                         fontSize: 17.0,
                         color: Color(0xFF162A49)),
                   ),
-                  Text(
-                    'Powered by ETHERIK',
+                  
+                 Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children:[
+                     Text(
+                    'Powered by ',
                     style: TextStyle(
                         fontWeight: FontWeight.w500,
                         fontSize: 18.0,
                         color: Color(0xFF162A49)),
                   ),
+                  SizedBox(width: 5,),
+                  Image.asset("assets/images/logo.png", height: MediaQuery.of(context).size.height * .04,)
+                  ]),
                 ]),
             padding: EdgeInsets.all(5.0),
           )),

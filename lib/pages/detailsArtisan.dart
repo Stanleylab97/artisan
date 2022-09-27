@@ -141,7 +141,7 @@ class _DetailArtisanState extends State<DetailArtisan> {
                                   fontSize: 16,
                                 ),
                               ),
-                              SizedBox(width: 27),
+                              
                               FloatingActionButton.extended(
                                 label: Text(
                                   'Appeler',
@@ -193,11 +193,13 @@ class _DetailArtisanState extends State<DetailArtisan> {
                 height: 45,
                 decoration: BoxDecoration(
                     color: Color.fromARGB(255, 168, 168, 161),
-                    borderRadius: BorderRadius.circular(25.0)),
+                   // borderRadius: BorderRadius.circular(25.0)
+                    ),
                 child: TabBar(
                   indicator: BoxDecoration(
                       color: Colors.green,
-                      borderRadius: BorderRadius.circular(25.0)),
+                     // borderRadius: BorderRadius.circular(25.0)
+                      ),
                   labelColor: Colors.white,
                   unselectedLabelColor: Colors.black,
                   tabs: const [

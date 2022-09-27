@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:ui';
-
+import 'package:artisan/main.dart';
+import 'package:artisan/services/sql_helper.dart';
 import 'package:another_flushbar/flushbar.dart';
 import 'package:artisan/models/commune.dart';
 import 'package:artisan/models/departement.dart';
@@ -20,7 +21,14 @@ import '../models/arrondissement.dart';
 import '../models/artisan.dart' show Artisan, UserModel;
 
 class Search extends StatefulWidget {
-  const Search({Key? key}) : super(key: key);
+  final String? metier, departement, commune, arrondissement;
+  const Search(
+      {Key? key,
+      this.metier,
+      this.departement,
+      this.commune,
+      this.arrondissement})
+      : super(key: key);
 
   @override
   State<Search> createState() => _SearchState();
@@ -55,6 +63,43 @@ class _SearchState extends State<Search> {
     panelController = PanelController();
     super.initState();
     listArtisans = filteredArtisans = Artisan.getArtisans();
+    if(widget.metier != null){
+ if (widget.commune == null && widget.arrondissement == null) {
+      filteredArtisans = listArtisans
+          .where((artisan) =>
+              artisan.professionCode == widget.metier &&
+              artisan.addrDept == widget.departement)
+          .toList();
+          
+                    print('département');
+                    print("${filteredArtisans.length}");
+    } else if (widget.commune != null && widget.arrondissement == null) {
+      filteredArtisans = listArtisans
+          .where((artisan) =>
+              artisan.professionCode == widget.metier &&
+              artisan.addrDept == widget.departement &&
+              artisan.commune == widget.commune)
+          .toList();
+                    print('commune');
+    } else if (widget.commune != null && widget.arrondissement != null) {
+      filteredArtisans = listArtisans
+          .where((artisan) =>
+                  artisan.professionCode == widget.metier &&
+                  artisan.addrDept == widget.departement &&
+                  artisan.commune == widget.commune //&&
+              //artisan.arrd == widget.arrondissement.toString()
+              )
+          .toList();
+          print('arrondissement');
+    }
+    }else{
+
+      listArtisans = filteredArtisans = Artisan.getArtisans();
+      print("default");
+    
+    }
+   
+   
   }
 
   @override
@@ -96,80 +141,94 @@ class _SearchState extends State<Search> {
     Size size = MediaQuery.of(context).size;
     _panelHeightOpen = size.height * .668;
 
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(
-          'Liste des artisans',
-          style: TextStyle(color: Colors.white),
-        ),
-        actions: [
-          IconButton(
-            onPressed: () {
-              showSearch(
-                context: context,
-                delegate: CustomSearchDelegate(),
-              );
+    return WillPopScope(
+      onWillPop: () async {
+        Navigator.push(
+            context, MaterialPageRoute(builder: (context) => MyHomePage()));
+        return true;
+      },
+      child: Scaffold(
+        appBar: AppBar(
+          leading: GestureDetector(
+            onTap: () {
+              Navigator.push(context,
+                  MaterialPageRoute(builder: (context) => MyHomePage()));
             },
-            icon: const Icon(FontAwesomeIcons.magnifyingGlass),
-          )
-        ],
-      ),
-      body: Stack(
-        alignment: Alignment.topCenter,
-        children: <Widget>[
-          SlidingUpPanel(
-            snapPoint: .5,
-            disableDraggableOnScrolling: false,
-            header: SizedBox(
-              width: MediaQuery.of(context).size.width,
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  ForceDraggableWidget(
-                    child: Container(
-                      width: 100,
-                      height: 40,
-                      child: Column(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          SizedBox(
-                            height: 12.0,
-                          ),
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: <Widget>[
-                              Container(
-                                width: 30,
-                                height: 7,
-                                decoration: BoxDecoration(
-                                    color: Colors.white,
-                                    borderRadius: BorderRadius.all(
-                                        Radius.circular(12.0))),
-                              ),
-                            ],
-                          ),
-                        ],
+            child: Icon(Icons.arrow_back),
+          ),
+          title: Text(
+            'Liste des artisans',
+            style: TextStyle(color: Colors.white),
+          ),
+          actions: [
+            IconButton(
+              onPressed: () {
+                showSearch(
+                  context: context,
+                  delegate: CustomSearchDelegate(),
+                );
+              },
+              icon: const Icon(FontAwesomeIcons.magnifyingGlass),
+            )
+          ],
+        ),
+        body: Stack(
+          alignment: Alignment.topCenter,
+          children: <Widget>[
+            SlidingUpPanel(
+              snapPoint: .5,
+              disableDraggableOnScrolling: false,
+              header: SizedBox(
+                width: MediaQuery.of(context).size.width,
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    ForceDraggableWidget(
+                      child: Container(
+                        width: 100,
+                        height: 40,
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            SizedBox(
+                              height: 12.0,
+                            ),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: <Widget>[
+                                Container(
+                                  width: 30,
+                                  height: 7,
+                                  decoration: BoxDecoration(
+                                      color: Colors.white,
+                                      borderRadius: BorderRadius.all(
+                                          Radius.circular(12.0))),
+                                ),
+                              ],
+                            ),
+                          ],
+                        ),
                       ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
+              maxHeight: _panelHeightOpen,
+              minHeight: size.height * .07,
+              parallaxEnabled: true,
+              parallaxOffset: .5,
+              body: ArtisanList(filteredArtisans: filteredArtisans),
+              controller: panelController,
+              scrollController: scrollController,
+              panelBuilder: () => _panel(metierC, depC, commC, arrC),
+              borderRadius: BorderRadius.only(
+                  topLeft: Radius.circular(20.0),
+                  topRight: Radius.circular(20.0)),
+              onPanelSlide: (double pos) => setState(() {}),
+              color: Colors.green.withOpacity(0.9),
             ),
-            maxHeight: _panelHeightOpen,
-            minHeight: size.height * .07,
-            parallaxEnabled: true,
-            parallaxOffset: .5,
-            body: ArtisanList(filteredArtisans: filteredArtisans),
-            controller: panelController,
-            scrollController: scrollController,
-            panelBuilder: () => _panel(metierC, depC, commC, arrC),
-            borderRadius: BorderRadius.only(
-                topLeft: Radius.circular(20.0),
-                topRight: Radius.circular(20.0)),
-            onPanelSlide: (double pos) => setState(() {}),
-            color: Colors.green.withOpacity(0.9),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
@@ -292,6 +351,15 @@ class _SearchState extends State<Search> {
                           if (param[2] != "" && param[3] != "") {
                             print(
                                 'Metier: ${param[0]} de  ${param[1]} in commune ${param[2]} & arrondissement ${param[3]}');
+                            SQLHelper.saveResearch(
+                                metierC.text,
+                                param[0],
+                                depC.text,
+                                param[1],
+                                commC.text,
+                                param[2],
+                                arrC.text,
+                                param[3]);
                             filteredArtisans = listArtisans
                                 .where((artisan) =>
                                         artisan.professionCode == param[0] &&
@@ -305,6 +373,15 @@ class _SearchState extends State<Search> {
                           if (param[2] != "" && param[3] == "") {
                             print(
                                 'Metier: ${param[0]} de  ${param[1]} in commune ${param[2]}');
+                            SQLHelper.saveResearch(
+                                metierC.text,
+                                param[0],
+                                depC.text,
+                               param[1],
+                                commC.text,
+                                param[2],
+                                null,
+                                null);
                             filteredArtisans = listArtisans
                                 .where((artisan) =>
                                         artisan.professionCode == param[0] &&
@@ -318,55 +395,21 @@ class _SearchState extends State<Search> {
                           if (param[2] == "" && param[3] == "") {
                             print(
                                 'Metier: ${param[0]} de departemement  ${param[1]} ');
+                            SQLHelper.saveResearch(
+                                metierC.text,
+                                param[0],
+                                depC.text,
+                                param[1],
+                                null,
+                                null,
+                                null,
+                                null);
                             filteredArtisans = listArtisans
                                 .where((artisan) =>
                                     artisan.professionCode == param[0] &&
                                     artisan.addrDept == param[1])
                                 .toList();
                           }
-
-                          /* if (param[1] != "") {
-                            if (param[2] != "" && param[3] != "") {
-                              print('Metier: ${param[0]} de  ${param[1]} in commune ${param[2]} & arrondissement ${param[3]}');
-                              filteredArtisans = listArtisans
-                                  .where((artisan) =>
-                                          artisan.professionCode == param[0] &&
-                                          artisan.addrDept == param[1] &&
-                                          artisan.commune == param[2] //&&
-                                      //artisan.addrDept == param[3]
-                                      )
-                                  .toList();
-                              print(
-                                  'Liste filtrée: ${filteredArtisans.length}');
-                            }
-                          } else {
-                            if (param[2] != "") {
-                              if (param[3] != "") {
-                                print(
-                                    '${param[0]}  in commune ${param[2]}  and arrondissement ${param[3]} ');
-                                filteredArtisans = listArtisans
-                                    .where((artisan) =>
-                                            artisan.professionCode ==
-                                                param[0] &&
-                                            artisan.commune == param[2] //&&
-                                        //artisan.addrDept == param[3]
-                                        )
-                                    .toList();
-                                print(
-                                    'Liste filtrée: ${filteredArtisans.length}');
-                              } else {
-
-                              }
-                            } else {
-                              print('${param[0]}  in all country');
-                              filteredArtisans = listArtisans
-                                  .where((artisan) =>
-                                      artisan.professionCode == param[0])
-                                  .toList();
-                              print(
-                                  'Liste filtrée: ${filteredArtisans.length}');
-                            }
-                          } */
                         } else {
                           Flushbar(
                             message:
