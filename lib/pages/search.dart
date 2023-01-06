@@ -15,10 +15,13 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:lottie/lottie.dart';
 import 'package:searchfield/searchfield.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sliding_up_panel2/sliding_up_panel2.dart';
 import 'package:substring_highlight/substring_highlight.dart';
 import '../models/arrondissement.dart';
 import '../models/artisan.dart' show Artisan, UserModel;
+import '../models/record.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class Search extends StatefulWidget {
   final String? metier, departement, commune, arrondissement;
@@ -56,50 +59,48 @@ class _SearchState extends State<Search> {
   double _panelHeightClosed = 95.0;
   late final ScrollController scrollController;
   late final PanelController panelController;
+  late bool p;
 
   @override
   void initState() {
     scrollController = ScrollController();
     panelController = PanelController();
+    p = false;
     super.initState();
     listArtisans = filteredArtisans = Artisan.getArtisans();
-    if(widget.metier != null){
- if (widget.commune == null && widget.arrondissement == null) {
-      filteredArtisans = listArtisans
-          .where((artisan) =>
-              artisan.professionCode == widget.metier &&
-              artisan.addrDept == widget.departement)
-          .toList();
-          
-                    print('département');
-                    print("${filteredArtisans.length}");
-    } else if (widget.commune != null && widget.arrondissement == null) {
-      filteredArtisans = listArtisans
-          .where((artisan) =>
-              artisan.professionCode == widget.metier &&
-              artisan.addrDept == widget.departement &&
-              artisan.commune == widget.commune)
-          .toList();
-                    print('commune');
-    } else if (widget.commune != null && widget.arrondissement != null) {
-      filteredArtisans = listArtisans
-          .where((artisan) =>
-                  artisan.professionCode == widget.metier &&
-                  artisan.addrDept == widget.departement &&
-                  artisan.commune == widget.commune //&&
-              //artisan.arrd == widget.arrondissement.toString()
-              )
-          .toList();
-          print('arrondissement');
-    }
-    }else{
+    if (widget.metier != null) {
+      if (widget.commune == null && widget.arrondissement == null) {
+        filteredArtisans = listArtisans
+            .where((artisan) =>
+                artisan.professionCode == widget.metier &&
+                artisan.addrDept == widget.departement)
+            .toList();
 
+        /*  print('département');
+                    print("${filteredArtisans.length}"); */
+      } else if (widget.commune != null && widget.arrondissement == null) {
+        filteredArtisans = listArtisans
+            .where((artisan) =>
+                artisan.professionCode == widget.metier &&
+                artisan.addrDept == widget.departement &&
+                artisan.commune == widget.commune)
+            .toList();
+        print('commune');
+      } else if (widget.commune != null && widget.arrondissement != null) {
+        filteredArtisans = listArtisans
+            .where((artisan) =>
+                    artisan.professionCode == widget.metier &&
+                    artisan.addrDept == widget.departement &&
+                    artisan.commune == widget.commune //&&
+                //artisan.arrd == widget.arrondissement.toString()
+                )
+            .toList();
+        print('arrondissement');
+      }
+    } else {
       listArtisans = filteredArtisans = Artisan.getArtisans();
       print("default");
-    
     }
-   
-   
   }
 
   @override
@@ -294,42 +295,40 @@ class _SearchState extends State<Search> {
                           width: 50,
                         ),
                         Expanded(
-                          child: Container(
-                            child: SearchField(
-                              controller: metierC,
-                              onSuggestionTap: (x) {
-                                param[0] = Metier.getMetiers()
-                                    .firstWhere(
-                                        (element) => element.nom == x.searchKey)
-                                    .code;
+                          child: SearchField(
+                            controller: metierC,
+                            onSuggestionTap: (x) {
+                              param[0] = Metier.getMetiers()
+                                  .firstWhere(
+                                      (element) => element.nom == x.searchKey)
+                                  .code;
 
-                                print(param[0]);
-                              },
-                              hint: 'Entrez le métier',
-                              searchStyle: TextStyle(
-                                fontSize: 18,
-                                color: Colors.white.withOpacity(0.8),
-                              ),
-                              //onSuggestionTap:,
-                              suggestions: Metier.getMetiers()
-                                  .map((e) => SearchFieldListItem(e.nom,
-                                      child: Text(e.nom)))
-                                  .toList(),
-                              searchInputDecoration: InputDecoration(
-                                  hintStyle: TextStyle(color: Colors.white),
-                                  enabledBorder: OutlineInputBorder(
-                                      borderSide: BorderSide(
-                                          color: Colors.white, width: 1),
-                                      borderRadius: BorderRadius.circular(10)),
-                                  focusedBorder: OutlineInputBorder(
-                                      borderSide: BorderSide(
-                                          color: Colors.white, width: 2),
-                                      borderRadius: BorderRadius.circular(10))),
-                              itemHeight: 50,
-                              suggestionsDecoration: BoxDecoration(
-                                  color: Colors.white,
-                                  borderRadius: BorderRadius.circular(10)),
+                              print(param[0]);
+                            },
+                            hint: 'Entrez le métier',
+                            searchStyle: TextStyle(
+                              fontSize: 18,
+                              color: Colors.white.withOpacity(0.8),
                             ),
+                            //onSuggestionTap:,
+                            suggestions: Metier.getMetiers()
+                                .map((e) => SearchFieldListItem(e.nom,
+                                    child: Text(e.nom)))
+                                .toList(),
+                            searchInputDecoration: InputDecoration(
+                                hintStyle: TextStyle(color: Colors.white),
+                                enabledBorder: OutlineInputBorder(
+                                    borderSide: BorderSide(
+                                        color: Colors.white, width: 1),
+                                    borderRadius: BorderRadius.circular(10)),
+                                focusedBorder: OutlineInputBorder(
+                                    borderSide: BorderSide(
+                                        color: Colors.white, width: 2),
+                                    borderRadius: BorderRadius.circular(10))),
+                            itemHeight: 50,
+                            suggestionsDecoration: BoxDecoration(
+                                color: Colors.white,
+                                borderRadius: BorderRadius.circular(10)),
                           ),
                         ),
                       ],
@@ -345,13 +344,39 @@ class _SearchState extends State<Search> {
                     splashColor: Colors.red,
                     focusColor: Colors.yellow,
                     highlightColor: Colors.purple,
-                    onTap: () {
-                      setState(() {
-                        if (param[0] != "" && param[1] != "") {
-                          if (param[2] != "" && param[3] != "") {
-                            print(
-                                'Metier: ${param[0]} de  ${param[1]} in commune ${param[2]} & arrondissement ${param[3]}');
-                            SQLHelper.saveResearch(
+                    onTap: () async {
+                      SharedPreferences prefs =
+                          await SharedPreferences.getInstance();
+                      if (param[0] != "" && param[1] != "") {
+                        if (param[2] != "" && param[3] != "") {
+                          print(
+                              'Metier: ${param[0]} de  ${param[1]} in commune ${param[2]} & arrondissement ${param[3]}');
+                         prefs.setString("metier", param[0]);
+                          prefs.setString("departement", param[1]);
+                          prefs.setString("commune", param[2]);
+                          prefs.setString("arrondissement", param[3]);
+                          if (prefs.getInt('nbsearch') != 0) {
+                            Future<List<Map<String, dynamic>>> re =
+                                Future.value(SQLHelper.last());
+
+                            re.then((value) {
+                              for (var y in value) {
+                                if (y['metier_id'] ==
+                                        prefs.getString("metier") &&
+                                    y['dep_id'] ==
+                                        prefs.getString("departement") &&
+                                    y['com_id'] == prefs.getString("commune") &&
+                                    y['arr_id'] == prefs.getString('arrondissement'))
+                                  prefs.setBool('isnew', false);
+                                else
+                                  prefs.setBool('isnew', true);
+                              }
+                            });
+                          } else
+                            prefs.setBool('isnew', true);
+
+                          if (prefs.getBool('isnew') == true){
+ SQLHelper.saveResearch(
                                 metierC.text,
                                 param[0],
                                 depC.text,
@@ -360,69 +385,129 @@ class _SearchState extends State<Search> {
                                 param[2],
                                 arrC.text,
                                 param[3]);
-                            filteredArtisans = listArtisans
-                                .where((artisan) =>
-                                        artisan.professionCode == param[0] &&
-                                        artisan.addrDept == param[1] &&
-                                        artisan.commune == param[2] //&&
-                                    //artisan.addrDept == param[3]
-                                    )
-                                .toList();
-                          }
 
-                          if (param[2] != "" && param[3] == "") {
-                            print(
-                                'Metier: ${param[0]} de  ${param[1]} in commune ${param[2]}');
-                            SQLHelper.saveResearch(
-                                metierC.text,
-                                param[0],
-                                depC.text,
-                               param[1],
-                                commC.text,
-                                param[2],
-                                null,
-                                null);
-                            filteredArtisans = listArtisans
-                                .where((artisan) =>
-                                        artisan.professionCode == param[0] &&
-                                        artisan.addrDept == param[1] &&
-                                        artisan.commune == param[2] //&&
-                                    //artisan.addrDept == param[3]
-                                    )
-                                .toList();
+                          prefs.setInt(
+                              'nbsearch', prefs.getInt('nbsearch')! + 1);
                           }
+                           
 
-                          if (param[2] == "" && param[3] == "") {
-                            print(
-                                'Metier: ${param[0]} de departemement  ${param[1]} ');
+                          filteredArtisans = listArtisans
+                              .where((artisan) =>
+                                      artisan.professionCode == param[0] &&
+                                      artisan.addrDept == param[1] &&
+                                      artisan.commune == param[2] //&&
+                                  //artisan.addrDept == param[3]
+                                  )
+                              .toList();
+                        }
+
+                        if (param[2] != "" && param[3] == "") {
+                          print(
+                              'Metier: ${param[0]} de  ${param[1]} in commune ${param[2]}');
+                          prefs.setString("metier", param[0]);
+                          prefs.setString("departement", param[1]);
+                          prefs.setString("commune", param[2]);
+                          if (prefs.getInt('nbsearch') != 0) {
+                            Future<List<Map<String, dynamic>>> re =
+                                Future.value(SQLHelper.last());
+                            re.then((value) {
+                              for (var y in value) {
+                                if (y['metier_id'] ==
+                                        prefs.getString("metier") &&
+                                    y['dep_id'] ==
+                                        prefs.getString("departement") &&
+                                    y['com_id'] == prefs.getString("commune") &&
+                                    y['arr_id'] == null)
+                                  prefs.setBool('isnew', false);
+                                else
+                                  prefs.setBool('isnew', true);
+                              }
+                            });
+                          } else
+                            prefs.setBool('isnew', true);
+                          // bool p= await SQLHelper.isNewResearch(param[0], param[1],  param[2], null);
+                          if (prefs.getBool('isnew') == true) {
                             SQLHelper.saveResearch(
                                 metierC.text,
                                 param[0],
                                 depC.text,
                                 param[1],
-                                null,
-                                null,
+                                commC.text,
+                                param[2],
                                 null,
                                 null);
-                            filteredArtisans = listArtisans
-                                .where((artisan) =>
-                                    artisan.professionCode == param[0] &&
-                                    artisan.addrDept == param[1])
-                                .toList();
+                            prefs.setInt(
+                                'nbsearch', prefs.getInt('nbsearch')! + 1);
                           }
-                        } else {
-                          Flushbar(
-                            message:
-                                "Veuillez définir le métier et le département",
-                            icon: Icon(
-                              Icons.info_outline,
-                              size: 28.0,
-                              color: Colors.blue[300],
-                            ),
-                            duration: Duration(seconds: 3),
-                          )..show(context);
+
+                          filteredArtisans = listArtisans
+                              .where((artisan) =>
+                                      artisan.professionCode == param[0] &&
+                                      artisan.addrDept == param[1] &&
+                                      artisan.commune == param[2] //&&
+                                  //artisan.addrDept == param[3]
+                                  )
+                              .toList();
                         }
-                      });
+
+                        if (param[2] == "" && param[3] == "") {
+                          print(
+                              'Metier: ${param[0]} de departemement  ${param[1]} ');
+                          prefs.setString("metier", param[0]);
+                          prefs.setString("departement", param[1]);
+                          print("NB search: ${prefs.getInt('nbsearch')}");
+                          if (prefs.getInt('nbsearch') != 0) {
+                            Future<List<Map<String, dynamic>>> re =
+                                Future.value(SQLHelper.last());
+
+                            re.then((value) {
+                              for (var y in value) {
+                                //   print("Saisies met ${prefs.getString('metier')} et dep ${prefs.getString('departement')}");
+                                if (y['metier_id'] ==
+                                        prefs.getString('metier') &&
+                                    y['dep_id'] ==
+                                        prefs.getString('departement') &&
+                                    y['com_id'] == null &&
+                                    y['arr_id'] == null)
+                                  prefs.setBool('isnew', false);
+                                else {
+                                  prefs.setBool('isnew', true);
+                                  print("C'est un nouveau");
+                                }
+                              }
+                            });
+                          } else {
+                            prefs.setBool('isnew', true);
+                            print("Pas de recherche enregistrée");
+                          }
+
+                          print('Valeur: ${prefs.getBool("isnew")}');
+                          if (prefs.getBool('isnew') == true) {
+                            SQLHelper.saveResearch(metierC.text, param[0],
+                                depC.text, param[1], null, null, null, null);
+                            prefs.setInt(
+                                'nbsearch', prefs.getInt('nbsearch')! + 1);
+                          }
+
+                          filteredArtisans = listArtisans
+                              .where((artisan) =>
+                                  artisan.professionCode == param[0] &&
+                                  artisan.addrDept == param[1])
+                              .toList();
+                        }
+                      } else {
+                        Flushbar(
+                          message:
+                              "Veuillez définir le métier et le département",
+                          icon: Icon(
+                            Icons.info_outline,
+                            size: 28.0,
+                            color: Colors.blue[300],
+                          ),
+                          duration: Duration(seconds: 3),
+                        ).show(context);
+                      }
+
                       setState(() {
                         param = ['', '', '', ''];
                         metierC.clear();
@@ -447,7 +532,7 @@ class _SearchState extends State<Search> {
                 ],
               ),
             ),
-            SizedBox(
+            const SizedBox(
               height: 24,
             ),
           ],

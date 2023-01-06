@@ -14,7 +14,8 @@ class SQLHelper {
         commune TEXT, 
         com_id TEXT,
         arrondissement TEXT,
-        arr_id TEXT
+        arr_id TEXT,
+        createdAt DATE DEFAULT (datetime('now','localtime'))
       )
       """);
   }
@@ -24,7 +25,7 @@ class SQLHelper {
 
   static Future<sql.Database> db() async {
     Directory documentsDirectory = await getApplicationDocumentsDirectory();
-        print(documentsDirectory.uri);
+       // print(documentsDirectory.uri);
        // String path = join(documentsDirectory.path, "database.db");
     return sql.openDatabase(
       'artisan.db',
@@ -45,11 +46,26 @@ class SQLHelper {
     return id;
   }
 
-  // Read 4 latest search (journals)
+  // Read 5 latest search (journals)
   static Future<List<Map<String, dynamic>>> getLatestSearch() async {
     final db = await SQLHelper.db();
     return db.query('search', orderBy: "id DESC", limit: 5);
   }
+
+ // Read 1 latest search (journals)
+  static Future<List<Map<String, dynamic>>> last() async {
+    final db = await SQLHelper.db();
+
+    Future<List<Map<String, Object?>>> x =db.rawQuery("SELECT * FROM search ORDER BY id DESC LIMIT 1");
+    
+    return x;
+     
+          /*  print("On est hors du if");
+     return  Future.value(true); */
+  }
+
+
+
 
 /*   // Read a single item by id
   // The app doesn't use this method but I put here in case you want to see it

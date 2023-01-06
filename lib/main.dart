@@ -12,6 +12,7 @@ import 'package:artisan/models/artisan.dart';
 import 'package:artisan/models/commune.dart';
 import 'package:artisan/models/departement.dart';
 import 'package:lottie/lottie.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'models/arrondissement.dart';
 
@@ -52,6 +53,8 @@ class _MyHomePageState extends State<MyHomePage> {
 
 void loadHistoric() async {
     final data = await SQLHelper.getLatestSearch();
+    SharedPreferences prefs=await SharedPreferences.getInstance();
+    prefs.setInt('nbsearch', data.length);
     setState(() {
       _journals = data;
       _isLoading = false;
