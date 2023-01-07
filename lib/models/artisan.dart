@@ -74,6 +74,7 @@ class Artisan {
 
 
   factory Artisan.fromJson(dynamic json) {
+    
     return Artisan(
         regNum: json['regNum'] as String,
         lepiCardNum: json['lepiCardNum'] ==null ? "" : json['lepiCardNum'] as String,
